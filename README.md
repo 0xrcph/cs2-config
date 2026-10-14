@@ -9,14 +9,23 @@
 
 </div>
 
-## Web builder
+## CS2 Config Lab (web)
 
-**[Open the builder](https://0xrcph.github.io/cs2-config/)** to make your own configs in the browser, nothing is uploaded:
+**[Open the Config Lab](https://0xrcph.github.io/cs2-config/)**. Free, runs in your browser, nothing is uploaded. Dark mode by default, with a light mode and a T side / CT side color switch.
 
-- **Crosshair** with a live preview, presets and copy-paste console commands
-- **Autoexec** with toggles for radar, viewmodel and quality of life, downloadable as `autoexec.cfg`
-- **Practice** config builder for offline grenade and aim practice
-- **Launch options** generator for Steam
+| Tool | What it does |
+|:--|:--|
+| **Crosshair** | Live preview on several backgrounds, presets, dynamic spread simulation, copy-paste commands, **share link**, and **import** from pasted `cl_crosshair` commands |
+| **Autoexec** | Radar, viewmodel and quality-of-life toggles, your crosshair, and **buy binds** with running prices. Downloads as `autoexec.cfg` |
+| **Practice** | Offline practice config builder: grenade preview, bots, noclip, rethrow, hotkeys |
+| **Launch options** | One-line Steam launch options generator |
+| **Sensitivity** | eDPI, cm/360, sens needed for a target, and conversion to VALORANT, Overwatch 2 and Apex |
+| **Economy** | Next-round money calculator with the loss-bonus ladder, plus a loadout cost calculator |
+| **Aim lab** | 30-second aim trainer with three modes that uses your own crosshair as the cursor, plus a reaction test |
+| **Warm-up** | Build a warm-up routine and run it with a step timer |
+| **Commands** | Searchable console command reference with one-click copy |
+
+You can also export all your settings to a file and import them on another device.
 
 ## What's inside
 
