@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="220" viewBox="0 0 900 220" role="img" aria-label="cs2-config: autoexec and practice configs for Counter-Strike 2">
+  <defs>
+    <linearGradient id="t" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#e6edf3"/>
+      <stop offset="1" stop-color="#f5a623"/>
+    </linearGradient>
+    <clipPath id="card"><rect width="900" height="220" rx="14"/></clipPath>
+    <clipPath id="c1"><rect x="48" y="118" height="22" width="0"><animate attributeName="width" values="0;0;201.6;201.6;0" keyTimes="0;0.05;0.2;0.9;1" dur="10s" repeatCount="indefinite"/></rect></clipPath>
+    <clipPath id="c2"><rect x="48" y="148" height="22" width="0"><animate attributeName="width" values="0;0;218.4;218.4;0" keyTimes="0;0.3;0.48;0.9;1" dur="10s" repeatCount="indefinite"/></rect></clipPath>
+  </defs>
+  <style>
+    .mono { font-family: 'Cascadia Code','SF Mono',Consolas,'Liberation Mono',monospace; }
+  </style>
+
+  <g clip-path="url(#card)">
+    <rect width="900" height="220" fill="#0d1117"/>
+
+    <!-- faint grid -->
+    <g stroke="#f5a623" stroke-opacity="0.05">
+      <path d="M0 40H900M0 80H900M0 120H900M0 160H900M0 200H900"/>
+      <path d="M60 0V220M180 0V220M300 0V220M420 0V220M540 0V220M660 0V220M780 0V220"/>
+    </g>
+
+    <!-- title -->
+    <text x="48" y="80" class="mono" font-size="46" font-weight="700" fill="url(#t)">cs2-config</text>
+
+    <!-- typed commands -->
+    <g class="mono" font-size="14">
+      <g clip-path="url(#c1)"><text x="48" y="134" textLength="201.6" lengthAdjust="spacingAndGlyphs" fill="#8b949e"><tspan fill="#f5a623">&gt;</tspan> exec autoexec.cfg</text></g>
+      <g clip-path="url(#c2)"><text x="48" y="164" textLength="218.4" lengthAdjust="spacingAndGlyphs" fill="#8b949e"><tspan fill="#f5a623">&gt;</tspan> exec practice.cfg</text></g>
+    </g>
+    <rect width="8" height="17" fill="#f5a623" x="48" y="119">
+      <animate attributeName="x" values="48;48;249.6;48;48;266.4;266.4;266.4" keyTimes="0;0.05;0.2;0.201;0.3;0.48;0.9;1" dur="10s" repeatCount="indefinite"/>
+      <animate attributeName="y" values="119;119;119;149;149;149;149;149" keyTimes="0;0.05;0.2;0.201;0.3;0.48;0.9;1" dur="10s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="1;0;1" dur="1s" repeatCount="indefinite"/>
+    </rect>
+    <text x="48" y="198" class="mono" font-size="12" fill="#8b949e">autoexec + offline practice config for Counter-Strike 2</text>
+
+    <!-- animated crosshair -->
+    <g transform="translate(730 110)">
+      <circle r="62" fill="none" stroke="#f5a623" stroke-opacity="0.18"/>
+      <circle r="40" fill="none" stroke="#f5a623" stroke-opacity="0.12"/>
+      <g stroke="#3fe08a" stroke-width="3" stroke-linecap="round">
+        <line x1="-6" y1="0" x2="-20" y2="0"><animate attributeName="x1" values="-6;-14;-6" dur="2.4s" repeatCount="indefinite"/><animate attributeName="x2" values="-20;-28;-20" dur="2.4s" repeatCount="indefinite"/></line>
+        <line x1="6" y1="0" x2="20" y2="0"><animate attributeName="x1" values="6;14;6" dur="2.4s" repeatCount="indefinite"/><animate attributeName="x2" values="20;28;20" dur="2.4s" repeatCount="indefinite"/></line>
+        <line x1="0" y1="-6" x2="0" y2="-20"><animate attributeName="y1" values="-6;-14;-6" dur="2.4s" repeatCount="indefinite"/><animate attributeName="y2" values="-20;-28;-20" dur="2.4s" repeatCount="indefinite"/></line>
+        <line x1="0" y1="6" x2="0" y2="20"><animate attributeName="y1" values="6;14;6" dur="2.4s" repeatCount="indefinite"/><animate attributeName="y2" values="20;28;20" dur="2.4s" repeatCount="indefinite"/></line>
+      </g>
+      <circle r="1.8" fill="#3fe08a"/>
+      <circle r="8" fill="none" stroke="#f5a623" stroke-width="2" opacity="0">
+        <animate attributeName="r" values="8;56" dur="2.4s" repeatCount="indefinite"/>
+        <animate attributeName="opacity" values="0.8;0" dur="2.4s" repeatCount="indefinite"/>
+      </circle>
+    </g>
+
+    <rect x="1" y="1" width="898" height="218" rx="13" fill="none" stroke="#f5a623" stroke-width="1.5" stroke-opacity="0.45">
+      <animate attributeName="stroke-opacity" values="0.2;0.8;0.2" dur="4s" repeatCount="indefinite"/>
+    </rect>
+  </g>
+</svg>
