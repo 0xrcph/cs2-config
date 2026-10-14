@@ -9,6 +9,15 @@
 
 </div>
 
+## Web builder
+
+**[Open the builder](https://0xrcph.github.io/cs2-config/)** to make your own configs in the browser, nothing is uploaded:
+
+- **Crosshair** with a live preview, presets and copy-paste console commands
+- **Autoexec** with toggles for radar, viewmodel and quality of life, downloadable as `autoexec.cfg`
+- **Practice** config builder for offline grenade and aim practice
+- **Launch options** generator for Steam
+
 ## What's inside
 
 | File | Use it for |

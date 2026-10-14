@@ -1,0 +1,448 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CS2 Config Builder</title>
+<meta name="description" content="Build a CS2 crosshair, autoexec, practice config and launch options in your browser.">
+<style>
+  :root {
+    color-scheme: dark;
+    --bg: #0d1117;
+    --panel: #161b22;
+    --line: #30363d;
+    --text: #e6edf3;
+    --mute: #8b949e;
+    --accent: #f5a623;
+    --good: #3fe08a;
+    --mono: 'Cascadia Code','SF Mono',Consolas,'Liberation Mono',monospace;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--text);
+    font: 15px/1.5 system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  }
+  .wrap { max-width: 980px; margin: 0 auto; padding: 24px 16px 64px; }
+  header h1 { font-family: var(--mono); font-size: 28px; margin: 0 0 4px; color: var(--accent); }
+  header p { margin: 0 0 20px; color: var(--mute); }
+  nav { display: flex; gap: 6px; flex-wrap: wrap; border-bottom: 1px solid var(--line); margin-bottom: 20px; }
+  nav button {
+    background: none; border: 0; color: var(--mute); padding: 10px 14px; cursor: pointer;
+    font: inherit; border-bottom: 2px solid transparent;
+  }
+  nav button[aria-selected="true"] { color: var(--text); border-bottom-color: var(--accent); }
+  nav button:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
+    outline: 2px solid var(--accent); outline-offset: 2px;
+  }
+  section[hidden] { display: none; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  @media (max-width: 760px) { .grid { grid-template-columns: 1fr; } }
+  .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 16px; }
+  .panel h2 { font-size: 13px; letter-spacing: .08em; text-transform: uppercase; color: var(--mute); margin: 0 0 12px; }
+  label { display: block; font-size: 14px; margin: 10px 0 4px; }
+  .row { display: flex; align-items: center; gap: 10px; }
+  .row input[type=range] { flex: 1; accent-color: var(--accent); }
+  .val { font-family: var(--mono); width: 44px; text-align: right; color: var(--accent); }
+  select, input[type=number], input[type=text] {
+    width: 100%; background: var(--bg); color: var(--text); border: 1px solid var(--line);
+    border-radius: 6px; padding: 7px 9px; font: inherit;
+  }
+  input[type=color] { width: 44px; height: 32px; border: 1px solid var(--line); background: var(--bg); border-radius: 6px; padding: 2px; }
+  .check { display: flex; align-items: center; gap: 8px; margin: 8px 0; cursor: pointer; }
+  .check input { accent-color: var(--accent); width: 16px; height: 16px; }
+  .hint { color: var(--mute); font-size: 12.5px; margin-left: 24px; margin-top: -4px; }
+  canvas { width: 100%; height: auto; border-radius: 8px; border: 1px solid var(--line); display: block; }
+  .bgs { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+  .chip, .btn {
+    background: var(--bg); color: var(--text); border: 1px solid var(--line); border-radius: 6px;
+    padding: 6px 12px; cursor: pointer; font: inherit; font-size: 13px;
+  }
+  .chip:hover, .btn:hover { border-color: var(--accent); }
+  .btn.primary { background: var(--accent); color: #111; border-color: var(--accent); font-weight: 600; }
+  textarea {
+    width: 100%; min-height: 220px; resize: vertical; background: var(--bg); color: var(--good);
+    border: 1px solid var(--line); border-radius: 6px; padding: 10px; font: 13px/1.5 var(--mono);
+  }
+  .actions { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+  .note { color: var(--mute); font-size: 12.5px; margin-top: 18px; }
+  .ok { color: var(--good); font-size: 13px; align-self: center; }
+  .warn { border-left: 3px solid var(--accent); background: rgba(245,166,35,.08); padding: 8px 12px; border-radius: 4px; font-size: 13px; margin-bottom: 14px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>cs2-config builder</h1>
+    <p>Build a crosshair, autoexec, practice config and launch options. Runs entirely in your browser, nothing is uploaded.</p>
+  </header>
+
+  <nav role="tablist" aria-label="Tools">
+    <button role="tab" aria-selected="true" data-tab="cross">Crosshair</button>
+    <button role="tab" aria-selected="false" data-tab="auto">Autoexec</button>
+    <button role="tab" aria-selected="false" data-tab="prac">Practice</button>
+    <button role="tab" aria-selected="false" data-tab="launch">Launch options</button>
+  </nav>
+
+  <!-- ============ CROSSHAIR ============ -->
+  <section id="cross">
+    <div class="grid">
+      <div class="panel">
+        <h2>Settings</h2>
+        <div class="row" style="margin-bottom:6px">
+          <button class="chip" data-preset="classic">Classic green</button>
+          <button class="chip" data-preset="dot">Dot</button>
+          <button class="chip" data-preset="tiny">Tiny cyan</button>
+          <button class="chip" data-preset="tcross">T-style</button>
+        </div>
+        <label for="x_style">Style</label>
+        <select id="x_style">
+          <option value="4">Classic Static</option>
+          <option value="3">Classic Dynamic</option>
+          <option value="2">Classic</option>
+          <option value="1">Default Static</option>
+        </select>
+        <label for="x_size">Length <span class="val" id="v_size"></span></label>
+        <div class="row"><input type="range" id="x_size" min="0" max="15" step="0.5"></div>
+        <label for="x_thick">Thickness <span class="val" id="v_thick"></span></label>
+        <div class="row"><input type="range" id="x_thick" min="0" max="6" step="0.5"></div>
+        <label for="x_gap">Gap <span class="val" id="v_gap"></span></label>
+        <div class="row"><input type="range" id="x_gap" min="-8" max="8" step="0.5"></div>
+        <label for="x_alpha">Opacity <span class="val" id="v_alpha"></span></label>
+        <div class="row"><input type="range" id="x_alpha" min="0" max="255" step="5"></div>
+        <label for="x_color">Color</label>
+        <div class="row"><input type="color" id="x_color"></div>
+        <label class="check"><input type="checkbox" id="x_outline"> Outline</label>
+        <label for="x_othick">Outline thickness <span class="val" id="v_othick"></span></label>
+        <div class="row"><input type="range" id="x_othick" min="0" max="3" step="0.5"></div>
+        <label class="check"><input type="checkbox" id="x_dot"> Center dot</label>
+        <label class="check"><input type="checkbox" id="x_t"> T-style (no top line)</label>
+      </div>
+
+      <div class="panel">
+        <h2>Preview</h2>
+        <canvas id="cv" width="480" height="300" aria-label="Crosshair preview"></canvas>
+        <div class="bgs">
+          <button class="chip" data-bg="dark">Dark</button>
+          <button class="chip" data-bg="light">Light</button>
+          <button class="chip" data-bg="sky">Sky</button>
+          <button class="chip" data-bg="wall">Wall</button>
+        </div>
+        <p class="note">Preview is approximate. Check it in a practice match, in-game scaling differs by resolution.</p>
+        <h2 style="margin-top:18px">Console commands</h2>
+        <textarea id="x_out" readonly spellcheck="false" style="min-height:190px"></textarea>
+        <div class="actions">
+          <button class="btn primary" id="x_copy">Copy</button>
+          <button class="btn" id="x_dl">Download crosshair.cfg</button>
+          <span class="ok" id="x_ok"></span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ AUTOEXEC ============ -->
+  <section id="auto" hidden>
+    <div class="grid">
+      <div class="panel">
+        <h2>Options</h2>
+        <label class="check"><input type="checkbox" id="a_radar" checked> Radar tweaks</label>
+        <label for="a_rscale">Radar scale <span class="val" id="v_rscale"></span></label>
+        <div class="row"><input type="range" id="a_rscale" min="0.2" max="1" step="0.05"></div>
+        <label for="a_hrscale">HUD radar size <span class="val" id="v_hrscale"></span></label>
+        <div class="row"><input type="range" id="a_hrscale" min="0.8" max="1.3" step="0.05"></div>
+        <label class="check"><input type="checkbox" id="a_center"> Keep radar centered on you</label>
+        <hr style="border:0;border-top:1px solid var(--line);margin:14px 0">
+        <label class="check"><input type="checkbox" id="a_vm"> Viewmodel</label>
+        <label for="a_fov">Viewmodel FOV <span class="val" id="v_fov"></span></label>
+        <div class="row"><input type="range" id="a_fov" min="54" max="68" step="1"></div>
+        <label for="a_ox">Offset X <span class="val" id="v_ox"></span></label>
+        <div class="row"><input type="range" id="a_ox" min="-2.5" max="2.5" step="0.5"></div>
+        <label for="a_oy">Offset Y <span class="val" id="v_oy"></span></label>
+        <div class="row"><input type="range" id="a_oy" min="-2" max="2" step="0.5"></div>
+        <label for="a_oz">Offset Z <span class="val" id="v_oz"></span></label>
+        <div class="row"><input type="range" id="a_oz" min="-2" max="2" step="0.5"></div>
+        <label class="check"><input type="checkbox" id="a_bob"> Reduce weapon bob</label>
+        <hr style="border:0;border-top:1px solid var(--line);margin:14px 0">
+        <label class="check"><input type="checkbox" id="a_buy" checked> E does not open buy menu</label>
+        <label class="check"><input type="checkbox" id="a_swap" checked> No auto weapon switch on pickup</label>
+        <label class="check"><input type="checkbox" id="a_mute" checked> Keep audio when alt-tabbed</label>
+        <label class="check"><input type="checkbox" id="a_fps"> Show FPS</label>
+        <label class="check"><input type="checkbox" id="a_cross"> Include my crosshair from the Crosshair tab</label>
+      </div>
+      <div class="panel">
+        <h2>autoexec.cfg</h2>
+        <div class="warn">Matchmaking-safe: no cheats and no automation binds.</div>
+        <textarea id="a_out" readonly spellcheck="false" style="min-height:360px"></textarea>
+        <div class="actions">
+          <button class="btn primary" id="a_copy">Copy</button>
+          <button class="btn" id="a_dl">Download autoexec.cfg</button>
+          <span class="ok" id="a_ok"></span>
+        </div>
+        <p class="note">Put it in <code>game/csgo/cfg/</code> inside your CS2 install, then add <code>+exec autoexec</code> to launch options.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ PRACTICE ============ -->
+  <section id="prac" hidden>
+    <div class="grid">
+      <div class="panel">
+        <h2>Options</h2>
+        <div class="warn">Offline only. This turns on <code>sv_cheats</code>, which doesn't work on official servers.</div>
+        <label for="p_round">Round time (minutes) <span class="val" id="v_round"></span></label>
+        <div class="row"><input type="range" id="p_round" min="1" max="60" step="1"></div>
+        <label for="p_money">Start money <span class="val" id="v_money"></span></label>
+        <div class="row"><input type="range" id="p_money" min="800" max="60000" step="800"></div>
+        <label class="check"><input type="checkbox" id="p_freeze" checked> No freeze time</label>
+        <label class="check"><input type="checkbox" id="p_buy" checked> Buy anywhere, unlimited buy time</label>
+        <label class="check"><input type="checkbox" id="p_nade" checked> Grenade trajectory preview and infinite ammo</label>
+        <label class="check"><input type="checkbox" id="p_impact" checked> Show bullet impacts</label>
+        <label class="check"><input type="checkbox" id="p_botstop" checked> Bots stand still</label>
+        <label class="check"><input type="checkbox" id="p_binds" checked> Practice hotkeys and aliases</label>
+        <p class="hint" style="margin-left:0">N noclip, K rethrow last grenade, L refill, O reload</p>
+      </div>
+      <div class="panel">
+        <h2>practice.cfg</h2>
+        <textarea id="p_out" readonly spellcheck="false" style="min-height:380px"></textarea>
+        <div class="actions">
+          <button class="btn primary" id="p_copy">Copy</button>
+          <button class="btn" id="p_dl">Download practice.cfg</button>
+          <span class="ok" id="p_ok"></span>
+        </div>
+        <p class="note">In a local match open the console and run <code>exec practice</code>.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ LAUNCH ============ -->
+  <section id="launch" hidden>
+    <div class="grid">
+      <div class="panel">
+        <h2>Options</h2>
+        <label class="check"><input type="checkbox" id="l_exec" checked> Run autoexec on start (<code>+exec autoexec</code>)</label>
+        <label class="check"><input type="checkbox" id="l_novid" checked> Skip intro video (<code>-novid</code>)</label>
+        <label class="check"><input type="checkbox" id="l_console"> Enable console on start (<code>-console</code>)</label>
+        <label class="check"><input type="checkbox" id="l_high"> High CPU priority (<code>-high</code>)</label>
+        <label class="check"><input type="checkbox" id="l_fps"> Set a max FPS (<code>+fps_max</code>)</label>
+        <label for="l_fpsval">fps_max value (0 = uncapped)</label>
+        <input type="number" id="l_fpsval" min="0" max="1000" step="1">
+      </div>
+      <div class="panel">
+        <h2>Launch options</h2>
+        <textarea id="l_out" readonly spellcheck="false" style="min-height:90px"></textarea>
+        <div class="actions">
+          <button class="btn primary" id="l_copy">Copy</button>
+          <span class="ok" id="l_ok"></span>
+        </div>
+        <p class="note">Steam: right-click Counter-Strike 2, Properties, General, Launch Options. Paste, then restart the game.</p>
+      </div>
+    </div>
+  </section>
+
+  <p class="note">Unofficial fan tool. Not affiliated with Valve. Console commands change with game updates, if one errors in the console, remove that line. Built by <a style="color:var(--accent)" href="https://github.com/0xrcph/cs2-config">0xrcph</a>.</p>
+</div>
+
+<script>
+(function () {
+  var $ = function (s) { return document.querySelector(s); };
+  var $$ = function (s) { return Array.prototype.slice.call(document.querySelectorAll(s)); };
+
+  // ---------- tiny storage helpers (safe if blocked) ----------
+  function load(key, fallback) {
+    try { var v = localStorage.getItem(key); return v ? JSON.parse(v) : fallback; } catch (e) { return fallback; }
+  }
+  function save(key, val) { try { localStorage.setItem(key, JSON.stringify(val)); } catch (e) {} }
+
+  // ---------- state ----------
+  var X = Object.assign({ style: 4, size: 5, thick: 1, gap: -1, alpha: 255, color: '#3fe08a', outline: true, othick: 1, dot: false, t: false }, load('cs2x', {}));
+  var A = Object.assign({ radar: true, rscale: 0.4, hrscale: 1.1, center: false, vm: false, fov: 68, ox: 2.5, oy: 0, oz: -1.5, bob: false, buy: true, swap: true, mute: true, fps: false, cross: false }, load('cs2a', {}));
+  var P = Object.assign({ round: 60, money: 60000, freeze: true, buy: true, nade: true, impact: true, botstop: true, binds: true }, load('cs2p', {}));
+  var L = Object.assign({ exec: true, novid: true, console: false, high: false, fps: false, fpsval: 0 }, load('cs2l', {}));
+
+  var PRESETS = {
+    classic: { style: 4, size: 5, thick: 1, gap: -1, alpha: 255, color: '#3fe08a', outline: true, othick: 1, dot: false, t: false },
+    dot:     { style: 4, size: 0, thick: 1, gap: 0,  alpha: 255, color: '#ffffff', outline: true, othick: 1, dot: true,  t: false },
+    tiny:    { style: 4, size: 2, thick: 1, gap: -2, alpha: 255, color: '#00e5ff', outline: true, othick: 0.5, dot: false, t: false },
+    tcross:  { style: 4, size: 4, thick: 1, gap: -1, alpha: 255, color: '#f5e050', outline: true, othick: 1, dot: false, t: true }
+  };
+
+  // ---------- binding ----------
+  function bind(obj, prefix, key, store, render) {
+    var el = $('#' + prefix + '_' + key);
+    if (!el) return;
+    var out = $('#v_' + key);
+    function show() { if (out) out.textContent = obj[key]; }
+    if (el.type === 'checkbox') el.checked = !!obj[key]; else el.value = obj[key];
+    show();
+    el.addEventListener('input', function () {
+      var v = el.type === 'checkbox' ? el.checked : (el.type === 'range' || el.type === 'number' ? parseFloat(el.value) : el.value);
+      if (el.tagName === 'SELECT') v = parseInt(el.value, 10);
+      obj[key] = v; show(); save(store, obj); render();
+    });
+  }
+  function n(v) { return Math.round(v * 100) / 100; }
+  function hex(c) { return [parseInt(c.slice(1, 3), 16), parseInt(c.slice(3, 5), 16), parseInt(c.slice(5, 7), 16)]; }
+
+  // ---------- crosshair ----------
+  var bgMode = 'dark';
+  function crossCommands() {
+    var c = hex(X.color);
+    return [
+      'cl_crosshairstyle ' + X.style,
+      'cl_crosshairsize ' + n(X.size),
+      'cl_crosshairthickness ' + n(X.thick),
+      'cl_crosshairgap ' + n(X.gap),
+      'cl_crosshair_drawoutline ' + (X.outline ? 1 : 0),
+      'cl_crosshair_outlinethickness ' + n(X.othick),
+      'cl_crosshaircolor 5',
+      'cl_crosshaircolor_r ' + c[0],
+      'cl_crosshaircolor_g ' + c[1],
+      'cl_crosshaircolor_b ' + c[2],
+      'cl_crosshairalpha ' + X.alpha,
+      'cl_crosshairdot ' + (X.dot ? 1 : 0),
+      'cl_crosshair_t ' + (X.t ? 1 : 0)
+    ];
+  }
+  function drawCross() {
+    var cv = $('#cv'), g = cv.getContext('2d'), W = cv.width, H = cv.height;
+    var bgs = {
+      dark: function () { g.fillStyle = '#10151c'; g.fillRect(0, 0, W, H); },
+      light: function () { g.fillStyle = '#d8dde3'; g.fillRect(0, 0, W, H); },
+      sky: function () { var gr = g.createLinearGradient(0, 0, 0, H); gr.addColorStop(0, '#6fb1e6'); gr.addColorStop(1, '#cfe6f7'); g.fillStyle = gr; g.fillRect(0, 0, W, H); },
+      wall: function () { g.fillStyle = '#b79a6b'; g.fillRect(0, 0, W, H); g.strokeStyle = 'rgba(0,0,0,.12)'; for (var i = 0; i < W; i += 40) { g.beginPath(); g.moveTo(i, 0); g.lineTo(i, H); g.stroke(); } for (var j = 0; j < H; j += 40) { g.beginPath(); g.moveTo(0, j); g.lineTo(W, j); g.stroke(); } }
+    };
+    bgs[bgMode]();
+    var s = 5;                                  // preview px per unit
+    var cx = W / 2, cy = H / 2;
+    var len = X.size * s, th = Math.max(1, X.thick * s * 0.6), gap = Math.max(0, (X.gap + 4) * s * 0.6) + th / 2;
+    var ot = X.outline ? Math.max(1, X.othick * s * 0.4) : 0;
+    var rgb = hex(X.color), a = X.alpha / 255;
+    function bar(x, y, w, h) {
+      if (ot) { g.fillStyle = 'rgba(0,0,0,' + a + ')'; g.fillRect(x - ot, y - ot, w + ot * 2, h + ot * 2); }
+    }
+    function fill(x, y, w, h) { g.fillStyle = 'rgba(' + rgb.join(',') + ',' + a + ')'; g.fillRect(x, y, w, h); }
+    var bars = [];
+    if (len > 0) {
+      bars.push([cx - gap - len, cy - th / 2, len, th]);                 // left
+      bars.push([cx + gap, cy - th / 2, len, th]);                       // right
+      bars.push([cx - th / 2, cy + gap, th, len]);                       // bottom
+      if (!X.t) bars.push([cx - th / 2, cy - gap - len, th, len]);       // top
+    }
+    if (X.dot) bars.push([cx - th / 2, cy - th / 2, th, th]);
+    bars.forEach(function (b) { bar.apply(null, b); });
+    bars.forEach(function (b) { fill.apply(null, b); });
+    $('#x_out').value = crossCommands().join('\n');
+  }
+
+  // ---------- autoexec ----------
+  function autoexec() {
+    var o = ['// cs2-config builder / autoexec.cfg', '// https://github.com/0xrcph/cs2-config', '', 'echo "[cs2-config] loading autoexec..."', ''];
+    if (A.radar) {
+      o.push('// Radar', 'cl_radar_scale ' + n(A.rscale), 'cl_hud_radar_scale ' + n(A.hrscale), 'cl_radar_always_centered ' + (A.center ? 1 : 0), '');
+    }
+    if (A.vm) {
+      o.push('// Viewmodel', 'viewmodel_fov ' + A.fov, 'viewmodel_offset_x ' + n(A.ox), 'viewmodel_offset_y ' + n(A.oy), 'viewmodel_offset_z ' + n(A.oz));
+      if (A.bob) o.push('cl_bob_lower_amt 5');
+      o.push('');
+    } else if (A.bob) { o.push('// Weapon bob', 'cl_bob_lower_amt 5', ''); }
+    var q = [];
+    if (A.buy) q.push('cl_use_opens_buy_menu 0');
+    if (A.swap) q.push('cl_autowepswitch 0');
+    if (A.mute) q.push('snd_mute_losefocus 0');
+    if (A.fps) q.push('cl_showfps 1');
+    if (q.length) o.push.apply(o, ['// Quality of life'].concat(q, ['']));
+    if (A.cross) o.push.apply(o, ['// Crosshair'].concat(crossCommands(), ['']));
+    o.push('echo "[cs2-config] done."');
+    return o.join('\n') + '\n';
+  }
+
+  // ---------- practice ----------
+  function practice() {
+    var o = ['// cs2-config builder / practice.cfg', '// OFFLINE only. sv_cheats does not work on official servers.', '', 'echo "[cs2-config] loading practice..."', '', 'sv_cheats 1', 'mp_warmup_end'];
+    o.push('mp_roundtime ' + P.round, 'mp_roundtime_defuse ' + P.round, 'mp_roundtime_hostage ' + P.round);
+    if (P.freeze) o.push('mp_freezetime 0');
+    o.push('mp_startmoney ' + P.money, 'mp_maxmoney ' + P.money);
+    if (P.buy) o.push('mp_buytime 9999', 'mp_buy_anywhere 1');
+    o.push('mp_autoteambalance 0', 'mp_limitteams 0', '');
+    if (P.nade) o.push('sv_infinite_ammo 1', 'ammo_grenade_limit_total 5', 'sv_grenade_trajectory_prac_pipreview 1', 'sv_grenade_trajectory_prac_trailtime 5', '');
+    if (P.impact) o.push('sv_showimpacts 1', '');
+    if (P.botstop) o.push('bot_stop 1');
+    o.push('bot_kick', '');
+    if (P.binds) {
+      o.push('alias rr "mp_restartgame 1"', 'alias bots "bot_kick; bot_add_t; bot_add_ct"', 'alias freeze "bot_stop 1"', 'alias unfreeze "bot_stop 0"', '',
+        'bind "n" "noclip"', 'bind "k" "sv_rethrow_last_grenade"', 'bind "l" "impulse 101"', 'bind "o" "exec practice"', '');
+    }
+    o.push('mp_restartgame 1', 'echo "[cs2-config] practice mode on."');
+    return o.join('\n') + '\n';
+  }
+
+  // ---------- launch ----------
+  function launch() {
+    var o = [];
+    if (L.exec) o.push('+exec autoexec');
+    if (L.novid) o.push('-novid');
+    if (L.console) o.push('-console');
+    if (L.high) o.push('-high');
+    if (L.fps) o.push('+fps_max ' + (parseInt(L.fpsval, 10) || 0));
+    return o.join(' ');
+  }
+
+  // ---------- render ----------
+  function renderAuto() { $('#a_out').value = autoexec(); }
+  function renderPrac() { $('#p_out').value = practice(); }
+  function renderLaunch() { $('#l_out').value = launch(); }
+  function renderAll() { drawCross(); renderAuto(); renderPrac(); renderLaunch(); }
+
+  ['style','size','thick','gap','alpha','color','outline','othick','dot','t'].forEach(function (k) { bind(X, 'x', k, 'cs2x', renderAll); });
+  ['radar','rscale','hrscale','center','vm','fov','ox','oy','oz','bob','buy','swap','mute','fps','cross'].forEach(function (k) { bind(A, 'a', k, 'cs2a', renderAll); });
+  ['round','money','freeze','buy','nade','impact','botstop','binds'].forEach(function (k) { bind(P, 'p', k, 'cs2p', renderAll); });
+  ['exec','novid','console','high','fps','fpsval'].forEach(function (k) { bind(L, 'l', k, 'cs2l', renderAll); });
+
+  // presets
+  $$('[data-preset]').forEach(function (b) {
+    b.addEventListener('click', function () {
+      Object.assign(X, PRESETS[b.getAttribute('data-preset')]);
+      ['style','size','thick','gap','alpha','color','outline','othick','dot','t'].forEach(function (k) {
+        var el = $('#x_' + k), out = $('#v_' + k);
+        if (el.type === 'checkbox') el.checked = !!X[k]; else el.value = X[k];
+        if (out) out.textContent = X[k];
+      });
+      save('cs2x', X); renderAll();
+    });
+  });
+  $$('[data-bg]').forEach(function (b) { b.addEventListener('click', function () { bgMode = b.getAttribute('data-bg'); drawCross(); }); });
+
+  // tabs
+  $$('nav button').forEach(function (b) {
+    b.addEventListener('click', function () {
+      $$('nav button').forEach(function (x) { x.setAttribute('aria-selected', x === b ? 'true' : 'false'); });
+      ['cross','auto','prac','launch'].forEach(function (id) { $('#' + id).hidden = id !== b.getAttribute('data-tab'); });
+    });
+  });
+
+  // copy / download
+  function flash(id, msg) { var el = $('#' + id); el.textContent = msg; setTimeout(function () { el.textContent = ''; }, 1800); }
+  function copy(srcId, okId) {
+    var ta = $('#' + srcId), text = ta.value;
+    function fallback() { ta.select(); try { document.execCommand('copy'); flash(okId, 'Copied'); } catch (e) { flash(okId, 'Press Ctrl+C'); } }
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(function () { flash(okId, 'Copied'); }, fallback);
+    else fallback();
+  }
+  function download(name, text) {
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([text], { type: 'text/plain' }));
+    a.download = name; document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function () { URL.revokeObjectURL(a.href); }, 1000);
+  }
+  $('#x_copy').addEventListener('click', function () { copy('x_out', 'x_ok'); });
+  $('#a_copy').addEventListener('click', function () { copy('a_out', 'a_ok'); });
+  $('#p_copy').addEventListener('click', function () { copy('p_out', 'p_ok'); });
+  $('#l_copy').addEventListener('click', function () { copy('l_out', 'l_ok'); });
+  $('#x_dl').addEventListener('click', function () { download('crosshair.cfg', crossCommands().join('\n') + '\n'); });
+  $('#a_dl').addEventListener('click', function () { download('autoexec.cfg', autoexec()); });
+  $('#p_dl').addEventListener('click', function () { download('practice.cfg', practice()); });
+
+  renderAll();
+})();
+</script>
+</body>
+</html>
